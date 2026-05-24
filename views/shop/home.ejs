@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>NOCTRA</h1>
+      <p>Premium Custom Clothing · Gaming Accessories · Wearables</p>
+      <a href="/shop" class="btn-primary">Shop Now →</a>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Shop by Category</h2>
+      <div class="category-grid">
+        <% const cats = ['Custom Clothing', 'Gaming Accessories', 'Wearables', 'Accessories']; %>
+        <% cats.forEach(cat => { %>
+          <a href="/shop?category=<%= encodeURIComponent(cat) %>" class="category-card">
+            <span><%= cat %></span>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured -->
+  <% if (featured.length > 0) { %>
+  <section class="section bg-dark">
+    <div class="container">
+      <h2 class="section-title">Featured Products</h2>
+      <div class="product-grid">
+        <% featured.forEach(p => { %>
+          <%- include('../partials/product-card', { p }) %>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- Latest -->
+  <% if (latest.length > 0) { %>
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Latest Arrivals</h2>
+      <div class="product-grid">
+        <% latest.forEach(p => { %>
+          <%- include('../partials/product-card', { p }) %>
+        <% }) %>
+      </div>
+      <div style="text-align:center;margin-top:32px;">
+        <a href="/shop" class="btn-primary">View All Products →</a>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <% if (featured.length === 0 && latest.length === 0) { %>
+  <section class="section">
+    <div class="container" style="text-align:center;padding:80px 0;">
+      <h2>No products yet</h2>
+      <p style="color:#aaa;margin:12px 0 24px;">Add your first product from the admin panel</p>
+      <a href="/admin" class="btn-primary">Go to Admin →</a>
+    </div>
+  </section>
+  <% } %>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>
