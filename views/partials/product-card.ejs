@@ -1,0 +1,24 @@
+<div class="product-card">
+  <% if (p.badge) { %><span class="badge"><%= p.badge %></span><% } %>
+  <a href="/product/<%= p.slug %>">
+    <div class="product-img-wrap">
+      <img src="<%= p.image %>" alt="<%= p.name %>" loading="lazy">
+    </div>
+  </a>
+  <div class="product-card-info">
+    <div class="product-cat"><%= p.category %></div>
+    <a href="/product/<%= p.slug %>"><h3 class="product-name"><%= p.name %></h3></a>
+    <% if (p.shortDescription) { %><p class="product-short-desc"><%= p.shortDescription %></p><% } %>
+    <div class="product-card-footer">
+      <div class="price-wrap">
+        <span class="price">৳<%= p.price.toLocaleString() %></span>
+        <% if (p.originalPrice && p.originalPrice > p.price) { %>
+          <span class="original-price">৳<%= p.originalPrice.toLocaleString() %></span>
+        <% } %>
+      </div>
+      <form action="/cart/add/<%= p._id %>" method="POST">
+        <button type="submit" class="btn-cart">Add 🛒</button>
+      </form>
+    </div>
+  </div>
+</div>
