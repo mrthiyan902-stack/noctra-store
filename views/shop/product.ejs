@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <div class="container" style="padding-top:40px;">
+    <a href="/shop" class="back-link">← Back to Shop</a>
+
+    <div class="product-detail">
+      <div class="product-detail-img">
+        <img src="<%= product.image %>" alt="<%= product.name %>">
+        <% if (product.badge) { %>
+          <span class="badge"><%= product.badge %></span>
+        <% } %>
+      </div>
+      <div class="product-detail-info">
+        <div class="product-category-tag"><%= product.category %></div>
+        <h1><%= product.name %></h1>
+        <% if (product.brand) { %><p class="brand">by <%= product.brand %></p><% } %>
+
+        <div class="product-price-wrap">
+          <span class="price">৳<%= product.price.toLocaleString() %></span>
+          <% if (product.originalPrice && product.originalPrice > product.price) { %>
+            <span class="original-price">৳<%= product.originalPrice.toLocaleString() %></span>
+            <span class="discount-pct">
+              <%= Math.round((1 - product.price/product.originalPrice)*100) %>% OFF
+            </span>
+          <% } %>
+        </div>
+
+        <p class="product-description"><%= product.description %></p>
+
+        <div class="stock-info">
+          <% if (product.stock > 0) { %>
+            <span class="in-stock">✓ In Stock (<%= product.stock %> available)</span>
+          <% } else { %>
+            <span class="out-stock">✗ Out of Stock</span>
+          <% } %>
+        </div>
+
+        <% if (product.stock > 0) { %>
+          <form action="/cart/add/<%= product._id %>" method="POST" class="add-to-cart-form">
+            <input type="number" name="qty" value="1" min="1" max="<%= product.stock %>" class="qty-input">
+            <button type="submit" class="btn-primary btn-large">Add to Cart 🛒</button>
+          </form>
+        <% } %>
+
+        <% if (product.tags && product.tags.length > 0) { %>
+          <div class="tags">
+            <% product.tags.forEach(tag => { %><span class="tag"><%= tag %></span><% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <% if (related.length > 0) { %>
+      <div class="related-section">
+        <h2 class="section-title">Related Products</h2>
+        <div class="product-grid">
+          <% related.forEach(p => { %>
+            <%- include('../partials/product-card', { p }) %>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>
