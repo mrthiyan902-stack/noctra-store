@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+  <div class="admin-login-wrap">
+    <div class="admin-login-card">
+      <h1 class="logo">NOCTRA</h1>
+      <p>Admin Panel</p>
+      <% if (locals.error && error.length > 0) { %>
+        <div class="flash flash-error"><%= error[0] %></div>
+      <% } %>
+      <form action="/admin/login" method="POST" class="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" required placeholder="admin">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn-primary btn-block">Login →</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
