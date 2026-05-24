@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+  <%- include('partials/sidebar') %>
+  <div class="admin-main">
+    <%- include('partials/topbar', { pageTitle: 'Dashboard' }) %>
+
+    <div class="admin-content">
+      <% if (locals.success && success.length > 0) { %><div class="flash flash-success"><%= success[0] %></div><% } %>
+      <% if (locals.error && error.length > 0) { %><div class="flash flash-error"><%= error[0] %></div><% } %>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <h2><%= totalProducts %></h2>
+            <p>Total Products</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-info">
+            <h2><%= totalOrders %></h2>
+            <p>Total Orders</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <h2><%= paidOrders %></h2>
+            <p>Paid Orders</p>
+          </div>
+        </div>
+        <div class="stat-card highlight">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h2>৳<%= revenue.toLocaleString() %></h2>
+            <p>Total Revenue</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <div class="section-header-row">
+          <h2>Recent Orders</h2>
+          <a href="/admin/orders" class="btn-sm">View All</a>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (recentOrders.length === 0) { %>
+                <tr><td colspan="7" style="text-align:center;color:#aaa;">No orders yet</td></tr>
+              <% } %>
+              <% recentOrders.forEach(order => { %>
+                <tr>
+                  <td><code><%= order.orderId %></code></td>
+                  <td><%= order.customer.name %></td>
+                  <td>৳<%= order.total.toLocaleString() %></td>
+                  <td><span class="status-badge <%= order.paymentStatus %>"><%= order.paymentStatus %></span></td>
+                  <td><span class="status-badge <%= order.orderStatus %>"><%= order.orderStatus %></span></td>
+                  <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                  <td><a href="/admin/orders/<%= order._id %>" class="btn-sm">View</a></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
