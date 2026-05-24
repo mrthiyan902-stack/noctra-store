@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+  <%- include('partials/sidebar') %>
+  <div class="admin-main">
+    <%- include('partials/topbar', { pageTitle: 'Products' }) %>
+    <div class="admin-content">
+      <% if (locals.success && success.length > 0) { %><div class="flash flash-success"><%= success[0] %></div><% } %>
+      <% if (locals.error && error.length > 0) { %><div class="flash flash-error"><%= error[0] %></div><% } %>
+
+      <div class="section-header-row">
+        <h2>All Products (<%= products.length %>)</h2>
+        <a href="/admin/products/new" class="btn-primary">+ Add Product</a>
+      </div>
+
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (products.length === 0) { %>
+              <tr><td colspan="7" style="text-align:center;color:#aaa;padding:40px;">No products yet. <a href="/admin/products/new">Add your first product</a></td></tr>
+            <% } %>
+            <% products.forEach(p => { %>
+              <tr>
+                <td><img src="<%= p.image %>" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:8px;"></td>
+                <td><strong><%= p.name %></strong><br><small style="color:#aaa;"><%= p.sku || '' %></small></td>
+                <td><%= p.category %></td>
+                <td>৳<%= p.price.toLocaleString() %></td>
+                <td><%= p.stock %></td>
+                <td><span class="status-badge <%= p.active ? 'paid' : 'failed' %>"><%= p.active ? 'Active' : 'Hidden' %></span></td>
+                <td class="action-btns">
+                  <a href="/admin/products/<%= p._id %>/edit" class="btn-sm">Edit</a>
+                  <form action="/admin/products/<%= p._id %>?_method=DELETE" method="POST" style="display:inline;" onsubmit="return confirm('Delete this product?')">
+                    <button type="submit" class="btn-sm btn-danger">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
