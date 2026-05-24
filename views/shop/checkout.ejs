@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <div class="container" style="padding-top:40px;">
+    <h1>Checkout</h1>
+
+    <div class="checkout-layout">
+      <div class="checkout-form-wrap">
+        <form action="/payment/initiate" method="POST" class="checkout-form">
+          <h2>Delivery Information</h2>
+
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" name="name" required placeholder="Your full name">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Phone *</label>
+              <input type="text" name="phone" required placeholder="01XXXXXXXXX">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" name="email" placeholder="your@email.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Delivery Address *</label>
+            <input type="text" name="address" required placeholder="House, Road, Area">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>City *</label>
+              <select name="city" required>
+                <option>Dhaka</option>
+                <option selected>Chattogram</option>
+                <option>Sylhet</option>
+                <option>Rajshahi</option>
+                <option>Khulna</option>
+                <option>Barisal</option>
+                <option>Mymensingh</option>
+                <option>Rangpur</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Postcode</label>
+              <input type="text" name="postcode" placeholder="e.g. 4216">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Order Notes</label>
+            <textarea name="notes" placeholder="Any special instructions..."></textarea>
+          </div>
+
+          <div class="payment-info-box">
+            <h3>💳 Payment</h3>
+            <p>You'll be redirected to SSLCommerz secure payment page where you can pay via:</p>
+            <div class="payment-icons">
+              <span>bKash</span>
+              <span>Nagad</span>
+              <span>Rocket</span>
+              <span>Visa/Mastercard</span>
+              <span>Net Banking</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary btn-large btn-block">
+            Pay ৳<%= subtotal.toLocaleString() %> Securely →
+          </button>
+        </form>
+      </div>
+
+      <div class="checkout-summary">
+        <h3>Your Order (<%= cart.length %> items)</h3>
+        <% cart.forEach(item => { %>
+          <div class="checkout-item">
+            <img src="<%= item.image %>" alt="<%= item.name %>">
+            <div>
+              <p><%= item.name %></p>
+              <p class="qty-label">x<%= item.qty %></p>
+            </div>
+            <span>৳<%= (item.price * item.qty).toLocaleString() %></span>
+          </div>
+        <% }) %>
+        <div class="summary-divider"></div>
+        <div class="summary-total">
+          <span>Total</span>
+          <span>৳<%= subtotal.toLocaleString() %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>
