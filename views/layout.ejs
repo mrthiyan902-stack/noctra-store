@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="logo">NOCTRA</a>
+      <div class="nav-links">
+        <a href="/shop">Shop</a>
+        <a href="/cart" class="cart-link">
+          🛒 Cart <span class="cart-count"><%= cartCount %></span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <% if (success && success.length > 0) { %>
+    <div class="flash success"><%= success[0] %></div>
+  <% } %>
+  <% if (error && error.length > 0) { %>
+    <div class="flash error"><%= error[0] %></div>
+  <% } %>
+
+  <%- body %>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> NOCTRA. All rights reserved.</p>
+  </footer>
+</body>
+</html>
