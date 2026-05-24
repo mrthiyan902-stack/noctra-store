@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <div class="container" style="padding-top:40px;">
+    <div class="shop-header">
+      <h1>All Products</h1>
+      <form class="shop-filters" method="GET" action="/shop">
+        <input type="text" name="search" placeholder="Search products..." value="<%= search || '' %>">
+        <select name="category">
+          <option value="">All Categories</option>
+          <% categories.forEach(c => { %>
+            <option value="<%= c %>" <%= category === c ? 'selected' : '' %>><%= c %></option>
+          <% }) %>
+        </select>
+        <select name="sort">
+          <option value="">Latest</option>
+          <option value="price-asc" <%= sort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
+          <option value="price-desc" <%= sort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
+          <option value="popular" <%= sort === 'popular' ? 'selected' : '' %>>Most Popular</option>
+        </select>
+        <button type="submit" class="btn-primary">Filter</button>
+      </form>
+    </div>
+
+    <% if (products.length > 0) { %>
+      <div class="product-grid">
+        <% products.forEach(p => { %>
+          <%- include('../partials/product-card', { p }) %>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div style="text-align:center;padding:80px 0;">
+        <h3>No products found</h3>
+        <p style="color:#aaa;margin-top:8px;">Try a different search or category</p>
+      </div>
+    <% } %>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>
