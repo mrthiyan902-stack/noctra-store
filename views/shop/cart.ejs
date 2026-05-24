@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <div class="container" style="padding-top:40px;">
+    <h1>Shopping Cart</h1>
+
+    <% if (cart.length === 0) { %>
+      <div class="empty-cart">
+        <p>🛒 Your cart is empty</p>
+        <a href="/shop" class="btn-primary">Continue Shopping</a>
+      </div>
+    <% } else { %>
+      <div class="cart-layout">
+        <div class="cart-items">
+          <% cart.forEach(item => { %>
+            <div class="cart-item">
+              <img src="<%= item.image %>" alt="<%= item.name %>">
+              <div class="cart-item-info">
+                <h3><%= item.name %></h3>
+                <p>৳<%= item.price.toLocaleString() %> each</p>
+              </div>
+              <form action="/cart/update/<%= item.productId %>" method="POST" class="qty-form">
+                <input type="number" name="qty" value="<%= item.qty %>" min="0" max="99">
+                <button type="submit" class="btn-sm">Update</button>
+              </form>
+              <div class="item-total">৳<%= (item.price * item.qty).toLocaleString() %></div>
+              <form action="/cart/remove/<%= item.productId %>" method="POST">
+                <button type="submit" class="btn-remove">✕</button>
+              </form>
+            </div>
+          <% }) %>
+        </div>
+
+        <div class="cart-summary">
+          <h3>Order Summary</h3>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>৳<%= subtotal.toLocaleString() %></span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span style="color:#2ecc71">Free</span>
+          </div>
+          <div class="summary-total">
+            <span>Total</span>
+            <span>৳<%= subtotal.toLocaleString() %></span>
+          </div>
+          <a href="/payment/checkout" class="btn-primary btn-block">Proceed to Checkout →</a>
+          <a href="/shop" class="btn-secondary btn-block">Continue Shopping</a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>
