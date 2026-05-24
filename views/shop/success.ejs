@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  <div class="container" style="padding-top:60px;text-align:center;">
+    <div class="success-box">
+      <div class="success-icon">✅</div>
+      <h1>Order Confirmed!</h1>
+      <p>Thank you for your order. We'll process it right away.</p>
+      <% if (order) { %>
+        <div class="order-id-box">
+          Order ID: <strong><%= order.orderId %></strong>
+        </div>
+        <p>We'll contact you at <strong><%= order.customer.phone %></strong> for delivery updates.</p>
+      <% } %>
+      <a href="/shop" class="btn-primary" style="margin-top:24px;display:inline-block;">Continue Shopping →</a>
+    </div>
+  </div>
+  <%- include('../partials/footer') %>
+</body>
+</html>
