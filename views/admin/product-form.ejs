@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+  <%- include('partials/sidebar') %>
+  <div class="admin-main">
+    <%- include('partials/topbar', { pageTitle: product ? 'Edit Product' : 'Add Product' }) %>
+    <div class="admin-content">
+      <% if (locals.error && error.length > 0) { %><div class="flash flash-error"><%= error[0] %></div><% } %>
+
+      <div class="form-card">
+        <form action="<%= product ? '/admin/products/' + product._id + '?_method=PUT' : '/admin/products' %>" method="POST" class="admin-form">
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Product Name *</label>
+              <input type="text" name="name" required value="<%= product ? product.name : '' %>" placeholder="e.g. Custom Oversized Tee">
+            </div>
+            <div class="form-group">
+              <label>Category *</label>
+              <select name="category" required>
+                <% const cats = ['Custom Clothing', 'Gaming Accessories', 'Wearables', 'Accessories', 'Footwear', 'Bags', 'Electronics', 'Other']; %>
+                <% cats.forEach(c => { %>
+                  <option value="<%= c %>" <%= product && product.category === c ? 'selected' : '' %>><%= c %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Price (৳) *</label>
+              <input type="number" name="price" required min="0" step="0.01" value="<%= product ? product.price : '' %>" placeholder="e.g. 1499">
+            </div>
+            <div class="form-group">
+              <label>Original Price (optional, for sale badge)</label>
+              <input type="number" name="originalPrice" min="0" step="0.01" value="<%= product && product.originalPrice ? product.originalPrice : '' %>" placeholder="e.g. 2000">
+            </div>
+            <div class="form-group">
+              <label>Stock Quantity *</label>
+              <input type="number" name="stock" required min="0" value="<%= product ? product.stock : '' %>" placeholder="e.g. 50">
+            </div>
+            <div class="form-group">
+              <label>Badge</label>
+              <select name="badge">
+                <% ['', 'New', 'Hot', 'Sale', 'Popular', 'Limited', 'Best Seller'].forEach(b => { %>
+                  <option value="<%= b %>" <%= product && product.badge === b ? 'selected' : '' %>><%= b || 'None' %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Short Description</label>
+              <input type="text" name="shortDescription" value="<%= product ? product.shortDescription || '' : '' %>" placeholder="One-line summary shown on product cards">
+            </div>
+            <div class="form-group full">
+              <label>Full Description *</label>
+              <textarea name="description" required placeholder="Detailed product description..."><%= product ? product.description : '' %></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Product Image URL *</label>
+              <input type="url" name="image" required value="<%= product ? product.image : '' %>" placeholder="https://example.com/image.jpg" id="imgUrl">
+              <div style="margin-top:10px;">
+                <img id="imgPreview" src="<%= product ? product.image : '' %>" alt="Preview" style="max-height:150px;border-radius:8px;<%= product && product.image ? '' : 'display:none;' %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Brand</label>
+              <input type="text" name="brand" value="<%= product ? product.brand || '' : '' %>" placeholder="e.g. NOCTRA">
+            </div>
+            <div class="form-group">
+              <label>SKU</label>
+              <input type="text" name="sku" value="<%= product ? product.sku || '' : '' %>" placeholder="e.g. NCT-001">
+            </div>
+            <div class="form-group full">
+              <label>Tags (comma-separated)</label>
+              <input type="text" name="tags" value="<%= product && product.tags ? product.tags.join(', ') : '' %>" placeholder="e.g. custom, streetwear, gaming">
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" name="featured" <%= product && product.featured ? 'checked' : '' %>>
+                Featured Product (show on homepage)
+              </label>
+            </div>
+            <% if (product) { %>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" name="active" value="true" <%= product.active ? 'checked' : '' %>>
+                Active (visible in store)
+              </label>
+            </div>
+            <% } %>
+          </div>
+
+          <div class="form-actions">
+            <a href="/admin/products" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary"><%= product ? '✓ Update Product' : '+ Publish Product' %></button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('imgUrl').addEventListener('input', function() {
+      const preview = document.getElementById('imgPreview');
+      if (this.value) { preview.src = this.value; preview.style.display = 'block'; }
+      else { preview.style.display = 'none'; }
+    });
+  </script>
+</body>
+</html>
