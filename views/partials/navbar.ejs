@@ -1,0 +1,18 @@
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="/" class="logo">NOCTRA</a>
+    <div class="nav-links">
+      <a href="/shop">Shop</a>
+      <a href="/cart" class="cart-link">
+        🛒 <span class="cart-count"><%= cartCount %></span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<% if (locals.success && success.length > 0) { %>
+  <div class="flash flash-success"><%= success[0] %></div>
+<% } %>
+<% if (locals.error && error.length > 0) { %>
+  <div class="flash flash-error"><%= error[0] %></div>
+<% } %>
