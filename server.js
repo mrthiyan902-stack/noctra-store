@@ -19,30 +19,7 @@ if (MONGODB_URI) {
 }
 
 // ── SESSION STORE ────────────────────────────────────────
-let sessionStore;
-if (MONGODB_URI) {
-  try {
-    const MongoStore = require('connect-mongo');
-    sessionStore = MongoStore.create({
-      mongoUrl: MONGODB_URI,
-      ttl: 60 * 60 * 24,
-      autoRemove: 'native'
-    });
-    console.log('✅ MongoDB session store configured');
-  } catch (e) {
-    console.warn('⚠️ connect-mongo unavailable, using memory store:', e.message);
-  }
-}
-
-// ── MIDDLEWARE ──────────────────────────────────────────
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(methodOverride('_method'));
-app.set('trust proxy', 1);
-
+// Always start with memory store (safe default)
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || 'noctra_secret_key_2024',
   resave: false,
@@ -55,9 +32,34 @@ const sessionConfig = {
   }
 };
 
-if (sessionStore) {
-  sessionConfig.store = sessionStore;
+// Try to upgrade to MongoDB-backed session store
+if (MONGODB_URI) {
+  try {
+    const MongoStore = require('connect-mongo');
+    const store = MongoStore.create({
+      mongoUrl: MONGODB_URI,
+      ttl: 60 * 60 * 24,
+      autoRemove: 'native',
+      touchAfter: 24 * 3600
+    });
+    store.on('error', (err) => {
+      console.error('⚠️ Session store error:', err.message);
+    });
+    sessionConfig.store = store;
+    console.log('✅ MongoDB session store configured');
+  } catch (e) {
+    console.warn('⚠️ connect-mongo load failed, using memory store:', e.message);
+  }
 }
+
+// ── MIDDLEWARE ──────────────────────────────────────────
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(methodOverride('_method'));
+app.set('trust proxy', 1);
 
 app.use(session(sessionConfig));
 app.use(flash());
@@ -77,6 +79,23 @@ app.use((req, res, next) => {
     res.locals.cartCount = 0;
   }
   next();
+});
+
+// ── DEBUG HEALTH CHECK ───────────────────────────────────
+app.get('/_health', (req, res) => {
+  res.json({
+    status: 'ok',
+    db: mongoose.connection.readyState, // 0=disconnected,1=connected,2=connecting,3=disconnecting
+    env: {
+      MONGODB_URI: MONGODB_URI ? '✅ set' : '❌ missing',
+      SESSION_SECRET: process.env.SESSION_SECRET ? '✅ set' : '❌ missing',
+      SSL_COMMERZ_STORE_ID: process.env.SSL_COMMERZ_STORE_ID ? '✅ set' : (process.env.SSLCOMMERZ_STORE_ID ? '✅ set (old key)' : '❌ missing'),
+      SSL_COMMERZ_STORE_PASSWORD: process.env.SSL_COMMERZ_STORE_PASSWORD ? '✅ set' : (process.env.SSLCOMMERZ_STORE_PASSWORD ? '✅ set (old key)' : '❌ missing'),
+      SSL_COMMERZ_IS_LIVE: process.env.SSL_COMMERZ_IS_LIVE || process.env.SSLCOMMERZ_IS_LIVE || '❌ missing',
+      APP_URL: process.env.APP_URL || '❌ missing (using localhost)',
+      NODE_ENV: process.env.NODE_ENV || 'not set'
+    }
+  });
 });
 
 // ── ROUTES ──────────────────────────────────────────────
