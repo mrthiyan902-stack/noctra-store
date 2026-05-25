@@ -9,23 +9,29 @@ const path = require('path');
 const app = express();
 
 // ── DB ──────────────────────────────────────────────────
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('MongoDB error:', err));
+const MONGODB_URI = process.env.MONGODB_URI;
+if (MONGODB_URI) {
+  mongoose.connect(MONGODB_URI)
+    .then(() => console.log('✅ MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err.message));
+} else {
+  console.error('⚠️ MONGODB_URI not set — database features unavailable');
+}
 
 // ── SESSION STORE ────────────────────────────────────────
 let sessionStore;
-try {
-  const MongoStore = require('connect-mongo');
-  sessionStore = MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
-    ttl: 60 * 60 * 24,
-    autoRemove: 'native'
-  });
-  console.log('✅ Using MongoDB session store');
-} catch (e) {
-  console.warn('⚠️ connect-mongo not available, using memory store:', e.message);
-  sessionStore = undefined;
+if (MONGODB_URI) {
+  try {
+    const MongoStore = require('connect-mongo');
+    sessionStore = MongoStore.create({
+      mongoUrl: MONGODB_URI,
+      ttl: 60 * 60 * 24,
+      autoRemove: 'native'
+    });
+    console.log('✅ MongoDB session store configured');
+  } catch (e) {
+    console.warn('⚠️ connect-mongo unavailable, using memory store:', e.message);
+  }
 }
 
 // ── MIDDLEWARE ──────────────────────────────────────────
@@ -42,7 +48,7 @@ const sessionConfig = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24, // 24 hours
+    maxAge: 1000 * 60 * 60 * 24,
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
@@ -58,11 +64,18 @@ app.use(flash());
 
 // ── GLOBAL LOCALS ───────────────────────────────────────
 app.use((req, res, next) => {
-  res.locals.success = req.flash('success');
-  res.locals.error = req.flash('error');
-  res.locals.admin = req.session.admin || null;
-  const cart = req.session.cart || [];
-  res.locals.cartCount = cart.reduce((sum, i) => sum + (i.qty || 0), 0);
+  try {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    res.locals.admin = req.session.admin || null;
+    const cart = req.session.cart || [];
+    res.locals.cartCount = cart.reduce((sum, i) => sum + (i.qty || 0), 0);
+  } catch (e) {
+    res.locals.success = [];
+    res.locals.error = [];
+    res.locals.admin = null;
+    res.locals.cartCount = 0;
+  }
   next();
 });
 
@@ -77,10 +90,20 @@ app.use((req, res) => {
   res.status(404).render('404', { title: 'Page Not Found' });
 });
 
-// ── ERROR HANDLER ────────────────────────────────────────
+// ── GLOBAL ERROR HANDLER ─────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  res.status(500).send('Internal Server Error');
+  console.error('Express error:', err.stack || err.message || err);
+  res.status(500).send('Something went wrong. Please try again.');
+});
+
+// ── UNHANDLED REJECTIONS ─────────────────────────────────
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err.stack || err.message);
+  // Don't exit — keep server alive
 });
 
 // ── START ────────────────────────────────────────────────
