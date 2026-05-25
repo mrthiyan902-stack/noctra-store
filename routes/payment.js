@@ -3,9 +3,9 @@ const router = express.Router();
 const axios = require('axios');
 const Order = require('../models/Order');
 
-const STORE_ID = process.env.SSLCOMMERZ_STORE_ID;
-const STORE_PASS = process.env.SSLCOMMERZ_STORE_PASSWORD;
-const IS_LIVE = process.env.SSLCOMMERZ_IS_LIVE === 'true';
+const STORE_ID = process.env.SSL_COMMERZ_STORE_ID;
+const STORE_PASS = process.env.SSL_COMMERZ_STORE_PASSWORD;
+const IS_LIVE = process.env.SSL_COMMERZ_IS_LIVE === 'true';
 const BASE_URL = IS_LIVE ? 'https://securepay.sslcommerz.com' : 'https://sandbox.sslcommerz.com';
 const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 
