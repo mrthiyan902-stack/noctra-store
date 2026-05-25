@@ -93,7 +93,11 @@ app.use((req, res) => {
 // ── GLOBAL ERROR HANDLER ─────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('Express error:', err.stack || err.message || err);
-  res.status(500).send('Something went wrong. Please try again.');
+  try {
+    res.status(500).render('500', { title: 'Error — NOCTRA' });
+  } catch (renderErr) {
+    res.status(500).send('Something went wrong. Please try again.');
+  }
 });
 
 // ── UNHANDLED REJECTIONS ─────────────────────────────────
