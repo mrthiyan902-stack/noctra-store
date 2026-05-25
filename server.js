@@ -20,11 +20,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
+app.set('trust proxy', 1);
 app.use(session({
   secret: process.env.SESSION_SECRET || 'noctra_secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 * 24 }
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  }
 }));
 app.use(flash());
 
