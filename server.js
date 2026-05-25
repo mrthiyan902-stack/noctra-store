@@ -10,12 +10,16 @@ const app = express();
 
 // ── DB ──────────────────────────────────────────────────
 const MONGODB_URI = process.env.MONGODB_URI;
+let dbError = null;
 if (MONGODB_URI) {
   mongoose.connect(MONGODB_URI)
-    .then(() => console.log('✅ MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err.message));
+    .then(() => { console.log('✅ MongoDB connected'); dbError = null; })
+    .catch(err => { console.error('MongoDB connection error:', err.message); dbError = err.message; });
+  mongoose.connection.on('error', err => { console.error('Mongoose error:', err.message); dbError = err.message; });
+  mongoose.connection.on('disconnected', () => console.warn('⚠️ Mongoose disconnected'));
 } else {
   console.error('⚠️ MONGODB_URI not set — database features unavailable');
+  dbError = 'MONGODB_URI not set';
 }
 
 // ── SESSION STORE ────────────────────────────────────────
@@ -86,6 +90,7 @@ app.get('/_health', (req, res) => {
   res.json({
     status: 'ok',
     db: mongoose.connection.readyState, // 0=disconnected,1=connected,2=connecting,3=disconnecting
+    dbError: dbError,
     env: {
       MONGODB_URI: MONGODB_URI ? '✅ set' : '❌ missing',
       SESSION_SECRET: process.env.SESSION_SECRET ? '✅ set' : '❌ missing',
