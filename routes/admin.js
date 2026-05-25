@@ -15,20 +15,32 @@ router.get('/login', (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
+  console.log('🔐 Login attempt:', username);
+  console.log('🔐 ENV username:', process.env.ADMIN_USERNAME);
+  console.log('🔐 Match:', username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD);
   try {
     // Check env credentials first, then DB
     if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
       req.session.admin = { username };
-      return res.redirect('/admin');
+      req.session.save((err) => {
+        if (err) console.error('Session save error:', err);
+        return res.redirect('/admin');
+      });
+      return;
     }
     const admin = await Admin.findOne({ username });
     if (admin && await admin.comparePassword(password)) {
       req.session.admin = { username };
-      return res.redirect('/admin');
+      req.session.save((err) => {
+        if (err) console.error('Session save error:', err);
+        return res.redirect('/admin');
+      });
+      return;
     }
     req.flash('error', 'Invalid username or password');
     res.redirect('/admin/login');
   } catch (err) {
+    console.error('Login error:', err);
     req.flash('error', 'Login failed');
     res.redirect('/admin/login');
   }
